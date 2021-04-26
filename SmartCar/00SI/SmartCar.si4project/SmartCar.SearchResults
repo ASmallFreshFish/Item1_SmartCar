@@ -1,0 +1,4 @@
+---- remoteC_status_t Matches (3 in 2 files) ----
+remotecontrol.c (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) line 27 : remoteC_status_t remoteC_get_status(void)
+remoteC_get_status in remotecontrol.c (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) : 	static remoteC_status_t sta = REMOTEC_STATUS_STOP;
+remotecontrol.h (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) line 23 : remoteC_status_t remoteC_get_status();
