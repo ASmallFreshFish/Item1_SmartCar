@@ -1,4 +1,5 @@
----- remoteC_status_t Matches (3 in 2 files) ----
-remotecontrol.c (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) line 27 : remoteC_status_t remoteC_get_status(void)
-remoteC_get_status in remotecontrol.c (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) : 	static remoteC_status_t sta = REMOTEC_STATUS_STOP;
-remotecontrol.h (X:\00Item\Item1_SmartCar\Software\SmartCar\HARDWARE\remotecotrol) line 23 : remoteC_status_t remoteC_get_status();
+---- GPIO_Pin_7 Matches (4 in 3 files) ----
+MOTOR_init in motor.c (X:\00Item\Item1_SmartCar\Software\GitHub\SmartCar\HARDWARE\motor) : 		|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;				 
+stm32f10x_gpio.h (X:\00Item\Item1_SmartCar\Software\GitHub\SmartCar\STM32F10x_FWLib\inc) line 134 : #define GPIO_Pin_7                 ((uint16_t)0x0080)  /*!< Pin 7 selected */
+IS_GET_GPIO_PIN in stm32f10x_gpio.h (X:\00Item\Item1_SmartCar\Software\GitHub\SmartCar\STM32F10x_FWLib\inc) :                               ((PIN) == GPIO_Pin_7) || \
+TIM4_PWM_Init in timer.c (X:\00Item\Item1_SmartCar\Software\GitHub\SmartCar\HARDWARE\TIMER) : 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; //TIM_CH2

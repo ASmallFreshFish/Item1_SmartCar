@@ -54,6 +54,16 @@ void HC05_receive(void)
 			//ֹͣ
 			blue_sta = BLUE_STATUS_STOP;
 		}
+		else if(strcmp((const char*)USART2_rx_buf,"SPEEDUP")==0)
+		{
+			//ֹͣ
+			blue_sta = BLUE_STATUS_SPEEDUP;
+		}
+		else if(strcmp((const char*)USART2_rx_buf,"SPEEDDOWN")==0)
+		{
+			//ֹͣ
+			blue_sta = BLUE_STATUS_SPEEDDOWN;
+		}
 
 		g_smartCar_sta =blue_sta;
 		

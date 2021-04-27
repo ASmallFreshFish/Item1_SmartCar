@@ -29,8 +29,9 @@
 
 /******************************************
 通用定时器：2、3、4、5
+其中，TIM3为示例demo
 ******************************************/
-
+#if 0
 //通用定时器3中断初始化
 //这里时钟选择为APB1的2倍，而APB1为36M
 //arr：自动重装值。
@@ -70,9 +71,6 @@ void TIM3_IRQHandler(void)   //TIM3中断
 		}
 }
 
-
-
-
 //TIM3 PWM部分初始化 
 //PWM输出初始化
 //arr：自动重装值
@@ -111,18 +109,104 @@ void TIM3_PWM_Init(u16 arr,u16 psc)
 	TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);  //使能TIM3在CCR2上的预装载寄存器
  
 	TIM_Cmd(TIM3, ENABLE);  //使能TIM3
-	
 
 }
 
+#endif
 
 
 /******************************************
-基础定时器：7
 
+通用定时器：4
+TIM4:
+PWM输出，用于控制电机转动速度，直流电机，占空比越大，速度越快
+
+其中:
+CH1:PB6
+CH2:PB7
+CH3:PB8
+CH4:PB9
+其中：ch1用于控制左边两个电机，ch2用于控制右边两个电机
 ******************************************/
 
+void TIM4_PWM_Init(u16 arr,u16 psc)
+{  
+	GPIO_InitTypeDef GPIO_InitStructure;
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_OCInitTypeDef  TIM_OCInitStructure;
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);	//使能定时器4时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);  //使能GPIO外设和AFIO复用功能模块时钟
+
+   	//设置该引脚为复用输出功能,输出TIM4 CH1-CH4的PWM脉冲波形	GPIOB.5 .6 .7 .8
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; //TIM_CH2
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;  //复用推挽输出
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化GPIO
+ 
+   	//初始化TIM4
+	TIM_TimeBaseStructure.TIM_Period = arr; //设置在下一个更新事件装入活动的自动重装载寄存器周期的值
+	TIM_TimeBaseStructure.TIM_Prescaler =psc; //设置用来作为TIMx时钟频率除数的预分频值 
+	TIM_TimeBaseStructure.TIM_ClockDivision = 0; //设置时钟分割:TDTS = Tck_tim
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;  //TIM向上计数模式
+	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure); //根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位
+	
+	//初始化TIM4 Channel1 PWM模式	 
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2; //选择定时器模式:TIM脉冲宽度调制模式2
+ 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; //输出极性:TIM输出比较极性高
+	TIM_OC1Init(TIM4, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM4 OC1
+	TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);  //使能TIM4在CCR2上的预装载寄存器
+	
+	//初始化TIM4 Channel2 PWM模式	 
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2; //选择定时器模式:TIM脉冲宽度调制模式2
+ 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; //输出极性:TIM输出比较极性高
+	TIM_OC2Init(TIM4, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM3 OC2
+	TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);  //使能TIM4在CCR2上的预装载寄存器
+
+	//初始化TIM4 Channel3 PWM模式	 
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2; //选择定时器模式:TIM脉冲宽度调制模式2
+ 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; //输出极性:TIM输出比较极性高
+	TIM_OC3Init(TIM4, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM4 OC3
+	TIM_OC3PreloadConfig(TIM4, TIM_OCPreload_Enable);  //使能TIM3在CCR2上的预装载寄存器
+	
+	//初始化TIM4 Channel4 PWM模式	 
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2; //选择定时器模式:TIM脉冲宽度调制模式2
+ 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //比较输出使能
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; //输出极性:TIM输出比较极性高
+	TIM_OC4Init(TIM4, &TIM_OCInitStructure);  //根据T指定的参数初始化外设TIM4 OC4
+	TIM_OC4PreloadConfig(TIM4, TIM_OCPreload_Enable);  //使能TIM3在CCR2上的预装载寄存器
+
+	TIM_Cmd(TIM4, ENABLE);  //使能TIM4
+
+}
+
+void TIM4_set_duty(u8 ch,u16 duty)
+{
+	switch(ch)
+	{
+		case 1:
+			TIM_SetCompare1(TIM4,duty);	
+			break;
+		case 2:
+			TIM_SetCompare2(TIM4,duty);	
+			break;
+		case 3:
+			TIM_SetCompare3(TIM4,duty);	
+			break;
+		case 4:
+			TIM_SetCompare4(TIM4,duty);	
+			break;
+		default:
+			break;
+	}
+}
+
 /******************************************
+
+基础定时器：7
 TIM7:
 用于定时10ms，蓝牙接收计算超时使用
 
@@ -169,6 +253,5 @@ void TIM7_IRQHandler(void)
 		TIM_Cmd(TIM7, DISABLE);  
 	}	    
 }
-
 
 

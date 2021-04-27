@@ -42,15 +42,39 @@ PF7/PF8	MOTOR_RIGHT_IN3/MOTOR_RIGHT_IN4	左2电机 +/- 向前 正传
 #define MOTOR_LEFT_2_IN1 MOTOR_RIGHT_IN3	//左2电机 
 #define MOTOR_LEFT_2_IN2 MOTOR_RIGHT_IN4
 
+#define MOTOR_LEFT_1_2	1
+#define MOTOR_RIGHT_1_2	2
+
+//因为TIM4的周期设置为10，故分为10档
+typedef enum _smartCar_speed
+{
+	MOTOR_SPEED_LEVEL1=1,
+	MOTOR_SPEED_LEVEL2=2,
+	MOTOR_SPEED_LEVEL3=3,
+	MOTOR_SPEED_LEVEL4=4,
+	MOTOR_SPEED_LEVEL5=5,
+	MOTOR_SPEED_LEVEL6=6,
+	MOTOR_SPEED_LEVEL7=7,
+	MOTOR_SPEED_LEVEL8=8,
+	MOTOR_SPEED_LEVEL9=9,
+	MOTOR_SPEED_LEVEL10=10
+}smartCar_speed_level_t;
 
 void MOTOR_init(void);//初始化
+void MOTOR_handle(void);
+
 void MOTOR_forward(void);
 void MOTOR_turn_left(void);
 void MOTOR_turn_right(void);
 void MOTOR_backward(void);
 void MOTOR_stop(void);
 
-void MOTOR_move();
+void MOTOR_set_speed(u8 ch,u8 speed_level);
+void MOTOR_speed_up(u8 *speed_level);
+void MOTOR_speed_down(u8 *speed_level);
+
+
+
 
 
 /*********************************************
@@ -58,7 +82,7 @@ void MOTOR_move();
 CAR
 
 *********************************************/
-typedef enum smartCar_status
+typedef enum _smartCar_status
 {
 	REMOTEC_STATUS_STOP = 0,
 	REMOTEC_STATUS_FORWARD,
@@ -70,18 +94,13 @@ typedef enum smartCar_status
 	BLUE_STATUS_FORWARD,
 	BLUE_STATUS_LEFT,
 	BLUE_STATUS_RIGHT,
-	BLUE_STATUS_BACKWARD
+	BLUE_STATUS_BACKWARD,
+	BLUE_STATUS_SPEEDUP,
+	BLUE_STATUS_SPEEDDOWN
 }smartCar_status_t;
 
 extern smartCar_status_t g_smartCar_sta;
-
-
-
-
-
-
-
-
+extern smartCar_speed_level_t g_smartCar_speed;
 
 
 

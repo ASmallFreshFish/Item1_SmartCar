@@ -2,8 +2,7 @@
 
 
 smartCar_status_t g_smartCar_sta = REMOTEC_STATUS_STOP;
-
-
+smartCar_speed_level_t g_smartCar_speed = MOTOR_SPEED_LEVEL5;
 
 //motor IO初始化
 void MOTOR_init(void)
@@ -28,10 +27,50 @@ void MOTOR_init(void)
 	MOTOR_LEFT_2_IN2 =0;
 	MOTOR_RIGHT_2_IN1 =0;	//右2电机
 	MOTOR_RIGHT_2_IN2 =0;
+
+	TIM4_PWM_Init(10,7199);	//1kHz,1ms
+	
+	MOTOR_set_speed(MOTOR_LEFT_1_2,(u8)MOTOR_SPEED_LEVEL10);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,(u8)MOTOR_SPEED_LEVEL10);
+	
+}
+
+void MOTOR_handle(void)
+{	
+	switch(g_smartCar_sta)
+	{	
+		case REMOTEC_STATUS_FORWARD:
+		case BLUE_STATUS_FORWARD:
+			MOTOR_forward();
+			break;
+		case REMOTEC_STATUS_LEFT:
+		case BLUE_STATUS_LEFT:
+			MOTOR_turn_left();
+			break;
+		case REMOTEC_STATUS_RIGHT:
+		case BLUE_STATUS_RIGHT:
+			MOTOR_turn_right();
+			break;
+		case REMOTEC_STATUS_BACKWARD:
+		case BLUE_STATUS_BACKWARD:
+			MOTOR_backward();
+			break;
+		case REMOTEC_STATUS_STOP:
+		case BLUE_STATUS_STOP:
+			MOTOR_stop();
+		case BLUE_STATUS_SPEEDUP:
+			MOTOR_speed_up(&g_smartCar_speed);
+			break;
+		case BLUE_STATUS_SPEEDDOWN:
+			MOTOR_speed_up(&g_smartCar_speed);
+			break;
+		default:
+			break;
+	}
 }
 
 /***********************************************
-右
+转向控制
 
 ************************************************/
 
@@ -42,6 +81,8 @@ void MOTOR_forward(void)
 	MOTOR_LEFT_2_IN1 = 1; MOTOR_LEFT_2_IN2 = 0;	
 	MOTOR_RIGHT_1_IN1 = 0;MOTOR_RIGHT_1_IN2 = 1;
 	MOTOR_RIGHT_2_IN1 = 1;MOTOR_RIGHT_2_IN2 = 0;
+	MOTOR_set_speed(MOTOR_LEFT_1_2,g_smartCar_speed);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,g_smartCar_speed);	
 }
 
 void MOTOR_turn_left(void)
@@ -50,6 +91,8 @@ void MOTOR_turn_left(void)
 	MOTOR_LEFT_2_IN1 = 0; MOTOR_LEFT_2_IN2 = 1;	
 	MOTOR_RIGHT_1_IN1 = 0;MOTOR_RIGHT_1_IN2 = 1;
 	MOTOR_RIGHT_2_IN1 = 1;MOTOR_RIGHT_2_IN2 = 0;
+	MOTOR_set_speed(MOTOR_LEFT_1_2,g_smartCar_speed);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,g_smartCar_speed);	
 	
 }
 void MOTOR_turn_right(void)
@@ -58,6 +101,8 @@ void MOTOR_turn_right(void)
 	MOTOR_LEFT_2_IN1 = 1; MOTOR_LEFT_2_IN2 = 0; 
 	MOTOR_RIGHT_1_IN1 = 1;MOTOR_RIGHT_1_IN2 = 0;
 	MOTOR_RIGHT_2_IN1 = 0;MOTOR_RIGHT_2_IN2 = 1;
+	MOTOR_set_speed(MOTOR_LEFT_1_2,g_smartCar_speed);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,g_smartCar_speed);	
 
 }
 void MOTOR_backward(void)
@@ -66,6 +111,8 @@ void MOTOR_backward(void)
 	MOTOR_LEFT_2_IN1 = 0; MOTOR_LEFT_2_IN2 = 1;	
 	MOTOR_RIGHT_1_IN1 = 1;MOTOR_RIGHT_1_IN2 = 0;
 	MOTOR_RIGHT_2_IN1 = 0;MOTOR_RIGHT_2_IN2 = 1;
+	MOTOR_set_speed(MOTOR_LEFT_1_2,g_smartCar_speed);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,g_smartCar_speed);	
 	
 }
 
@@ -77,8 +124,46 @@ void MOTOR_stop(void)
 	MOTOR_RIGHT_2_IN1 = 0;MOTOR_RIGHT_2_IN2 = 0;
 }
 
+//速度控制
+void MOTOR_set_speed(u8 ch,u8 speed_level)
+{
+	if((speed_level>10)||(speed_level<0))
+	{
+		return;
+	}
+	TIM4_set_duty(ch,speed_level);	
+}
+
+void MOTOR_speed_up(u8 *speed_level)
+{
+	(*speed_level)++;
+	if(*speed_level>10)
+	{
+		*speed_level = 10;
+	}
+	MOTOR_set_speed(MOTOR_LEFT_1_2,*speed_level);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,*speed_level);	
+}
+void MOTOR_speed_down(u8 *speed_level)
+{
+	(*speed_level)--;
+	if(*speed_level<1)
+	{
+		*speed_level = 1;
+	}
+	MOTOR_set_speed(MOTOR_LEFT_1_2,*speed_level);
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,*speed_level);	
+}
 
 
+
+
+
+
+
+
+
+//调试
 void MOTOR_left_1_forward(void)
 {
 	//左1：-/+；右1：+/-；左2：+/-；右2：-/+；
@@ -118,37 +203,3 @@ void MOTOR_right_2_forward(void)
 
 
 
-void MOTOR_handle()
-{	
-	switch(g_smartCar_sta)
-	{	
-		case REMOTEC_STATUS_FORWARD:
-		case BLUE_STATUS_FORWARD:
-			MOTOR_forward();
-			break;
-		case REMOTEC_STATUS_LEFT:
-		case BLUE_STATUS_LEFT:
-			MOTOR_turn_left();
-			break;
-		case REMOTEC_STATUS_RIGHT:
-		case BLUE_STATUS_RIGHT:
-			MOTOR_turn_right();
-			break;
-		case REMOTEC_STATUS_BACKWARD:
-		case BLUE_STATUS_BACKWARD:
-			MOTOR_backward();
-			break;
-		case REMOTEC_STATUS_STOP:
-		case BLUE_STATUS_STOP:
-			MOTOR_stop();
-			break;
-		default:
-			break;
-	}
-}
-
-
-
-
-
- 
