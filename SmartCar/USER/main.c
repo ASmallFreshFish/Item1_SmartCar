@@ -15,13 +15,13 @@
  int main(void)
  {	
  
- 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); //
+ 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); 
  	delay_init();
-	USART1_init(115200);
+	USART1_init(115200);	//USART1
 
 	LED_Init();		  	//初始化与LED连接的硬件接口
-	HC05_init();
-	MOTOR_init();
+	HC05_init();		//定时器TIM7和USART2
+	MOTOR_init();		
 	REMOTECONTROL_init();
 	
 	while(1)

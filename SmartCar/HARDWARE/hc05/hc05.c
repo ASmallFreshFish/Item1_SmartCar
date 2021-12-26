@@ -22,7 +22,9 @@ void HC05_send(void)
 void HC05_receive(void)
 {	
 	u16 len;
-	static smartCar_status_t blue_sta;
+	static smartCar_status_t blue_sta=REMOTEC_STATUS_STOP;
+	smartCar_speed_sta_t speed_sta=MOTOR_SPEED_STA_KEEP;
+	
 	if(USART2_rx_sta &(1<<USART2_REC_FINISH_FLAG_BIT))
 	{
 		len=USART2_rx_sta&0X7FFF;
@@ -57,17 +59,20 @@ void HC05_receive(void)
 		else if(strcmp((const char*)USART2_rx_buf,"SPEEDUP")==0)
 		{
 			//ֹͣ
-			blue_sta = BLUE_STATUS_SPEEDUP;
+			speed_sta = MOTOR_SPEED_STA_UP;
 		}
 		else if(strcmp((const char*)USART2_rx_buf,"SPEEDDOWN")==0)
 		{
 			//ֹͣ
-			blue_sta = BLUE_STATUS_SPEEDDOWN;
+			speed_sta = MOTOR_SPEED_STA_DOWN;
 		}
 
 		g_smartCar_sta =blue_sta;
+		g_smartCar_speed_sta =speed_sta;
+
 		
 		USART2_rx_sta = 0;
+		memset(USART2_rx_buf,0,sizeof(USART2_rx_buf));
 		
 		printf("%s",USART2_rx_buf);
 		

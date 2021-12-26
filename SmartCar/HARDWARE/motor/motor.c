@@ -2,7 +2,9 @@
 
 
 smartCar_status_t g_smartCar_sta = REMOTEC_STATUS_STOP;
-smartCar_speed_level_t g_smartCar_speed = MOTOR_SPEED_LEVEL5;
+smartCar_speed_level_t g_smartCar_speed = MOTOR_SPEED_LEVEL1;
+extern smartCar_speed_sta_t g_smartCar_speed_sta=MOTOR_SPEED_STA_KEEP;
+
 
 //motor IO≥ı ºªØ
 void MOTOR_init(void)
@@ -29,9 +31,10 @@ void MOTOR_init(void)
 	MOTOR_RIGHT_2_IN2 =0;
 
 	TIM4_PWM_Init(10,7199);	//1kHz,1ms
-	
-	MOTOR_set_speed(MOTOR_LEFT_1_2,(u8)MOTOR_SPEED_LEVEL10);	
-	MOTOR_set_speed(MOTOR_RIGHT_1_2,(u8)MOTOR_SPEED_LEVEL10);
+//	TIM4_PWM_Init(20000,7199);	//1kHz,1s
+
+	MOTOR_set_speed(MOTOR_LEFT_1_2,(u8)MOTOR_SPEED_LEVEL5);	
+	MOTOR_set_speed(MOTOR_RIGHT_1_2,(u8)MOTOR_SPEED_LEVEL5);
 	
 }
 
@@ -58,11 +61,23 @@ void MOTOR_handle(void)
 		case REMOTEC_STATUS_STOP:
 		case BLUE_STATUS_STOP:
 			MOTOR_stop();
-		case BLUE_STATUS_SPEEDUP:
-			MOTOR_speed_up(&g_smartCar_speed);
 			break;
-		case BLUE_STATUS_SPEEDDOWN:
+		default:
+			break;
+	}
+	
+	switch(g_smartCar_speed_sta)
+	{	
+		case MOTOR_SPEED_STA_UP:
 			MOTOR_speed_up(&g_smartCar_speed);
+			g_smartCar_speed_sta =MOTOR_SPEED_STA_KEEP;
+			
+			break;
+		case MOTOR_SPEED_STA_DOWN:
+			MOTOR_speed_down(&g_smartCar_speed);
+			g_smartCar_speed_sta =MOTOR_SPEED_STA_KEEP;
+			break;
+		case MOTOR_SPEED_STA_KEEP:
 			break;
 		default:
 			break;
@@ -143,6 +158,8 @@ void MOTOR_speed_up(u8 *speed_level)
 	}
 	MOTOR_set_speed(MOTOR_LEFT_1_2,*speed_level);	
 	MOTOR_set_speed(MOTOR_RIGHT_1_2,*speed_level);	
+
+	printf("spped up,g_smartCar_speed=%d\r\n",g_smartCar_speed);
 }
 void MOTOR_speed_down(u8 *speed_level)
 {
@@ -153,6 +170,7 @@ void MOTOR_speed_down(u8 *speed_level)
 	}
 	MOTOR_set_speed(MOTOR_LEFT_1_2,*speed_level);
 	MOTOR_set_speed(MOTOR_RIGHT_1_2,*speed_level);	
+	printf("spped down,g_smartCar_speed=%d\r\n",g_smartCar_speed);
 }
 
 
